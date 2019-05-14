@@ -1,0 +1,4 @@
+
+
+
+- Tile grids became common because it was the only way to make virtual worlds on a large scale like mario.
