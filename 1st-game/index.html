@@ -16,12 +16,31 @@ var canvasContext;
 var ballX = 75;
 var ballY = 75;
 
-// var paddle1Y = 100;
-// var paddle1X = 100;
+var ballSpeedX = 5;
+var ballSpeedY = 7;
 
+const PADDLE_WIDTH = 100;
+const PADDLE_THICKNESS = 10;
+const PADDLE_DIST_FROM_BOTTOM = 60;
+
+var paddleX = 400;
+var paddleY = 100;
+
+
+
+function updateMousePos(evt){
+  var rect = canvas.getBoundingClientRect();
+  var root = document.documentElement;
+
+  var mouseX = evt.clientX - rect.left - root.scrollLeft;
+
+  paddleX = mouseX - PADDLE_WIDTH/2;
+
+}
 
 
 window.onload = function(){
+
   console.log("Loaded");
 
   canvas = document.getElementById('gameCanvas');
@@ -31,24 +50,74 @@ window.onload = function(){
   var framesPerSecond = 30;
   setInterval(updateAll, 1000/framesPerSecond);
 
+  canvas.addEventListener('mousemove', updateMousePos);
+
 }
 
-function updateAll(){
-  ballX++;
+
+function colorRect(topLeftX, topLeftY, boxWidth,boxHeight, drawColor){
+  canvasContext.fillStyle = drawColor;
+  canvasContext.fillRect(topLeftX,topLeftY, boxWidth,boxHeight, drawColor);
+}
+
+function drawCircle(centerX,centerY, radius, fillColor){
+  canvasContext.fillStyle = fillColor;
+  canvasContext.beginPath(); //this is more of general routine
+  canvasContext.arc(centerX,centerY, radius, 0,Math.PI*2, true); //arc is more for drawing pi chart like things.
+  canvasContext.fill(); //this will fill the circle
+}
+
+
+function drawAll(){
+
+  colorRect(0,0,canvas.width,canvas.height, 'black');
+  drawCircle(ballX,ballY, 10, 'red');
+
+  colorRect(paddleX,canvas.height-PADDLE_DIST_FROM_BOTTOM, PADDLE_WIDTH,PADDLE_THICKNESS, 'white');
+
+}
+
+
+function ballReset(){
+  ballX = canvas.width/2;
+  ballY =  canvas.height/2;
+}
+
+function moveAll(){
+
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+
+  var paddleTopEdgeY    = canvas.height - PADDLE_DIST_FROM_BOTTOM;
+  var paddleBottomEdgeY = paddleTopEdgeY - PADDLE_THICKNESS;
+
+  var paddleLeftEdgeX   = paddleX;
+  var paddleRightEdgeX  = paddleLeftEdgeX + PADDLE_WIDTH;
+
+  if(ballY >= canvas.height){
+    ballReset();
+  }else if(ballY <= 0){
+    ballSpeedY *= -1;
+  }
+
+  if(ballX >= canvas.width){
+    ballSpeedX *= -1;
+  }else if(ballX <= 0){
+    ballSpeedX *= -1;
+  }
+
   console.log(ballX);
 
-  canvasContext.fillStyle = 'black';
-  canvasContext.fillRect(0,0,canvas.width,canvas.height);
-
-
-  canvasContext.fillStyle = 'white';
-  canvasContext.beginPath(); //this is more of general routine
-  canvasContext.arc(ballX,100,10,0,Math.PI*2, true); //arc is more for drawing pi chart like things.
-  canvasContext.fill(); //this will fill the circle
-
-  canvasContext.fillStyle = "white";
-  canvasContext.fillRect(300, 440, 200, 30);
 }
+
+
+function updateAll(){
+
+  drawAll(); //invokes the drawAll functon that draws canvas and ball etc.
+  moveAll(); //invokes the moveAll() function that is responsible for motion.
+
+}
+
 
 </script>
 </html>
