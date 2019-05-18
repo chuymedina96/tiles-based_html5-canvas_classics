@@ -60,6 +60,7 @@ function colorRect(topLeftX, topLeftY, boxWidth,boxHeight, drawColor){
   canvasContext.fillRect(topLeftX,topLeftY, boxWidth,boxHeight, drawColor);
 }
 
+
 function drawCircle(centerX,centerY, radius, fillColor){
   canvasContext.fillStyle = fillColor;
   canvasContext.beginPath(); //this is more of general routine
@@ -112,7 +113,7 @@ function moveAll(){
     ballSpeedX *= -1;
   }
 
-  console.log(ballX);
+  // console.log(ballX);
 
 }
 
