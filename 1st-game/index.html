@@ -8,6 +8,7 @@
   <body>
     <canvas id="gameCanvas" width="800" height="600"></canvas>
   </body>
+
 <script>
 
 var canvas;
@@ -19,6 +20,14 @@ var ballY = 75;
 var ballSpeedX = 5;
 var ballSpeedY = 7;
 
+const BRICK_W = 100;
+const BRICK_H = 50;
+const BRICK_COUNT = 4;
+
+
+var brickGrid = [true,false,true,true];
+
+
 const PADDLE_WIDTH = 100;
 const PADDLE_THICKNESS = 10;
 const PADDLE_DIST_FROM_BOTTOM = 60;
@@ -26,13 +35,17 @@ const PADDLE_DIST_FROM_BOTTOM = 60;
 var paddleX = 400;
 var paddleY = 100;
 
+var mouseX=0;
+var mouseY=0;
 
 
 function updateMousePos(evt){
+
   var rect = canvas.getBoundingClientRect();
   var root = document.documentElement;
 
-  var mouseX = evt.clientX - rect.left - root.scrollLeft;
+  mouseX = evt.clientX - rect.left - root.scrollLeft;
+  mouseY = evt.clientY - rect.top - root.scrollTop;
 
   paddleX = mouseX - PADDLE_WIDTH/2;
 
@@ -56,18 +69,49 @@ window.onload = function(){
 
 
 function colorRect(topLeftX, topLeftY, boxWidth,boxHeight, drawColor){
+
   canvasContext.fillStyle = drawColor;
   canvasContext.fillRect(topLeftX,topLeftY, boxWidth,boxHeight, drawColor);
+
 }
 
 
 function drawCircle(centerX,centerY, radius, fillColor){
+
   canvasContext.fillStyle = fillColor;
   canvasContext.beginPath(); //this is more of general routine
   canvasContext.arc(centerX,centerY, radius, 0,Math.PI*2, true); //arc is more for drawing pi chart like things.
   canvasContext.fill(); //this will fill the circle
+
 }
 
+
+function colorText(showWords, textX,textY, fillColor){
+
+  canvasContext.fillStyle = fillColor;
+  canvasContext.fillText(showWords, textX,textY);
+
+}
+
+
+function drawBricks(){
+
+  //USING THE COLORRECT FUNCTION LOCATED ON LINE 67 TO DRAW THE RECTANGLES FOR THE BRICKS.
+  if(brickGrid[0]){
+    colorRect(BRICK_W*0,0, BRICK_W-2, BRICK_H, 'blue');
+  }
+  if(brickGrid[1]){
+    colorRect(BRICK_W*1,0, BRICK_W-2, BRICK_H, 'yellow');
+  }
+  if(brickGrid[2]){
+    colorRect(BRICK_W*2,0, BRICK_W-2, BRICK_H, 'orange');
+  }
+  if(brickGrid[3]){
+    colorRect(BRICK_W*3,0, BRICK_W-2, BRICK_H, 'green');
+  }
+
+
+}
 
 function drawAll(){
 
@@ -76,20 +120,27 @@ function drawAll(){
 
   colorRect(paddleX,canvas.height-PADDLE_DIST_FROM_BOTTOM, PADDLE_WIDTH,PADDLE_THICKNESS, 'white');
 
+  drawBricks(); //THIS INVOKES THE DRAWBRICKS FUNCTION ON LINE 93 OF PROGRAM.
+
+  colorText(mouseX+" , "+mouseY, mouseX,mouseY, 'yellow');
+
 }
 
 
 function ballReset(){
+
   ballX = canvas.width/2;
   ballY =  canvas.height/2;
+
 }
+
 
 function moveAll(){
 
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
-  var paddleTopEdgeY    = canvas.height - PADDLE_DIST_FROM_BOTTOM;
+  var paddleTopEdgeY    = canvas.height - PADDLE_DIST_FROM_BOTTOM -5;
   var paddleBottomEdgeY = paddleTopEdgeY + PADDLE_THICKNESS;
   var paddleLeftEdgeX   = paddleX;
   var paddleRightEdgeX  = paddleLeftEdgeX + PADDLE_WIDTH;
@@ -99,6 +150,11 @@ function moveAll(){
      ballX > paddleLeftEdgeX && // right of the left side of paddle
      ballX < paddleRightEdgeX){ // ball is left of right of paddle
        ballSpeedY *= -1;
+
+
+      var centerOfPaddleX = paddleX + PADDLE_WIDTH/2;
+      var ballDistFromPaddleCenterX = ballX - centerOfPaddleX;
+      ballSpeedX = ballDistFromPaddleCenterX * 0.35;
   }
 
   if(ballY >= canvas.height){
