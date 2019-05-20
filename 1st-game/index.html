@@ -20,12 +20,13 @@ var ballY = 75;
 var ballSpeedX = 5;
 var ballSpeedY = 7;
 
-const BRICK_W = 100;
-const BRICK_H = 50;
-const BRICK_COUNT = 4;
+const BRICK_W = 80;
+const BRICK_H = 20;
+const BRICK_GAP = 2;
+const BRICK_COLS = 10;
+const BRICK_ROWS = 14;
 
-
-var brickGrid = [true,false,true,true];
+var brickGrid = new Array(BRICK_COLS * BRICK_ROWS);
 
 
 const PADDLE_WIDTH = 100;
@@ -52,6 +53,19 @@ function updateMousePos(evt){
 }
 
 
+function brickReset(){
+
+  for(var i =0; i < BRICK_COLS * BRICK_ROWS; i++){
+    if(Math.random() < 0.5){
+       brickGrid[i]= true;
+     }else{
+       brickGrid[i]= false;
+     } //end of else (rand check)
+  } // end of for each brick
+
+} // end of brickReset function
+
+
 window.onload = function(){
 
   console.log("Loaded");
@@ -64,6 +78,8 @@ window.onload = function(){
   setInterval(updateAll, 1000/framesPerSecond);
 
   canvas.addEventListener('mousemove', updateMousePos);
+
+  brickReset()
 
 }
 
@@ -95,23 +111,23 @@ function colorText(showWords, textX,textY, fillColor){
 
 
 function drawBricks(){
-
   //USING THE COLORRECT FUNCTION LOCATED ON LINE 67 TO DRAW THE RECTANGLES FOR THE BRICKS.
-  if(brickGrid[0]){
-    colorRect(BRICK_W*0,0, BRICK_W-2, BRICK_H, 'blue');
-  }
-  if(brickGrid[1]){
-    colorRect(BRICK_W*1,0, BRICK_W-2, BRICK_H, 'yellow');
-  }
-  if(brickGrid[2]){
-    colorRect(BRICK_W*2,0, BRICK_W-2, BRICK_H, 'orange');
-  }
-  if(brickGrid[3]){
-    colorRect(BRICK_W*3,0, BRICK_W-2, BRICK_H, 'green');
-  }
+  for(var eachRow = 0; eachRow < BRICK_ROWS; eachRow++){
 
+    for(var eachCol = 0; eachCol < BRICK_COLS; eachCol++){
+
+      var arrayIndex =  BRICK_COLS * eachRow + eachCol;
+
+      if(brickGrid[arrayIndex]){
+        colorRect(BRICK_W*eachCol, BRICK_H * eachRow, BRICK_W - BRICK_GAP,BRICK_H - BRICK_GAP, 'blue');
+      }
+
+    }
+
+  }
 
 }
+
 
 function drawAll(){
 
@@ -122,7 +138,10 @@ function drawAll(){
 
   drawBricks(); //THIS INVOKES THE DRAWBRICKS FUNCTION ON LINE 93 OF PROGRAM.
 
-  colorText(mouseX+" , "+mouseY, mouseX,mouseY, 'yellow');
+  var mouseBrickXCol = Math.floor(mouseX / BRICK_W);
+  var mouseBrickYRow = Math.floor(mouseY / BRICK_H);
+
+  colorText(mouseBrickXCol+" , "+mouseBrickYRow, mouseX,mouseY, 'red');
 
 }
 
@@ -140,7 +159,7 @@ function moveAll(){
   ballX += ballSpeedX;
   ballY += ballSpeedY;
 
-  var paddleTopEdgeY    = canvas.height - PADDLE_DIST_FROM_BOTTOM -5;
+  var paddleTopEdgeY    = canvas.height - PADDLE_DIST_FROM_BOTTOM;
   var paddleBottomEdgeY = paddleTopEdgeY + PADDLE_THICKNESS;
   var paddleLeftEdgeX   = paddleX;
   var paddleRightEdgeX  = paddleLeftEdgeX + PADDLE_WIDTH;
