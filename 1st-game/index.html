@@ -11,21 +11,30 @@
 
 <script>
 
+
 var canvas;
 var canvasContext;
 
+//Variables for ball X and Y dimensions.
 var ballX = 75;
 var ballY = 75;
 
+//Variables for ball Speed
 var ballSpeedX = 5;
 var ballSpeedY = 7;
 
+//constants for dimensions of bricks
 const BRICK_W = 80;
 const BRICK_H = 20;
+
+//constant for the Gap between bricks next to each other
 const BRICK_GAP = 2;
+
+//constants for columns and rows for bricks
 const BRICK_COLS = 10;
 const BRICK_ROWS = 11;
 
+//variable for putting coluns and rows into an array
 var brickGrid = new Array(BRICK_COLS * BRICK_ROWS);
 
 
@@ -40,32 +49,6 @@ var mouseX=0;
 var mouseY=0;
 
 
-function updateMousePos(evt){
-
-  var rect = canvas.getBoundingClientRect();
-  var root = document.documentElement;
-
-  mouseX = evt.clientX - rect.left - root.scrollLeft;
-  mouseY = evt.clientY - rect.top - root.scrollTop;
-
-  paddleX = mouseX - PADDLE_WIDTH/2;
-
-}
-
-
-function brickReset(){
-
-  for(var i =0; i < BRICK_COLS * BRICK_ROWS; i++){
-    if(Math.random() < 0.5){
-       brickGrid[i]= true;
-     }else{
-       brickGrid[i]= false;
-     } //end of else (rand check)
-  } // end of for each brick
-
-} // end of brickReset function
-
-
 window.onload = function(){
 
   console.log("Loaded");
@@ -75,56 +58,19 @@ window.onload = function(){
 
 
   var framesPerSecond = 30;
-  setInterval(updateAll, 1000/framesPerSecond);
+  setInterval(updateAll, 1000/framesPerSecond); //updateAll function on line 87
 
-  canvas.addEventListener('mousemove', updateMousePos);
+  canvas.addEventListener('mousemove', updateMousePos); //updateMousePos on line 83
 
-  brickReset()
-
-}
-
-
-function colorRect(topLeftX, topLeftY, boxWidth,boxHeight, drawColor){
-
-  canvasContext.fillStyle = drawColor;
-  canvasContext.fillRect(topLeftX,topLeftY, boxWidth,boxHeight, drawColor);
+  brickReset() //brickReset on line 44.
 
 }
 
 
-function drawCircle(centerX,centerY, radius, fillColor){
+function updateAll(){
 
-  canvasContext.fillStyle = fillColor;
-  canvasContext.beginPath(); //this is more of general routine
-  canvasContext.arc(centerX,centerY, radius, 0,Math.PI*2, true); //arc is more for drawing pi chart like things.
-  canvasContext.fill(); //this will fill the circle
-
-}
-
-
-function colorText(showWords, textX,textY, fillColor){
-
-  canvasContext.fillStyle = fillColor;
-  canvasContext.fillText(showWords, textX,textY);
-
-}
-
-
-function drawBricks(){
-  //USING THE COLORRECT FUNCTION LOCATED ON LINE 67 TO DRAW THE RECTANGLES FOR THE BRICKS.
-  for(var eachRow = 0; eachRow < BRICK_ROWS; eachRow++){
-
-    for(var eachCol = 0; eachCol < BRICK_COLS; eachCol++){
-
-      var arrayIndex =  BRICK_COLS * eachRow + eachCol;
-
-      if(brickGrid[arrayIndex]){
-        colorRect(BRICK_W*eachCol, BRICK_H * eachRow, BRICK_W - BRICK_GAP,BRICK_H - BRICK_GAP, 'blue');
-      }
-
-    }
-
-  }
+  drawAll(); //invokes the drawAll functon that draws canvas and ball etc.
+  moveAll(); //invokes the moveAll() function that is responsible for motion.
 
 }
 
@@ -142,14 +88,6 @@ function drawAll(){
   var mouseBrickYRow = Math.floor(mouseY / BRICK_H);
 
   colorText(mouseBrickXCol+" , "+mouseBrickYRow, mouseX,mouseY, 'red');
-
-}
-
-
-function ballReset(){
-
-  ballX = canvas.width/2;
-  ballY =  canvas.height/2;
 
 }
 
@@ -188,15 +126,89 @@ function moveAll(){
     ballSpeedX *= -1;
   }
 
-  // console.log(ballX);
+  //console.log(ballX);
 
 }
 
 
-function updateAll(){
+//Reset Code functionality below
+function ballReset(){
 
-  drawAll(); //invokes the drawAll functon that draws canvas and ball etc.
-  moveAll(); //invokes the moveAll() function that is responsible for motion.
+  ballX       = canvas.width / 2;
+  ballY       = canvas.height / 2;
+
+}
+
+
+function brickReset(){
+
+  for(var i =0; i < BRICK_COLS * BRICK_ROWS; i++){
+    if(Math.random() < 0.5){
+       brickGrid[i]= true;
+     }else{
+       brickGrid[i]= false;
+     } //end of else (rand check)
+  } // end of for each brick
+
+} // end of brickReset function
+
+
+//Mouse tracking functionality
+function updateMousePos(evt){
+
+  var rect = canvas.getBoundingClientRect();
+  var root = document.documentElement;
+
+  mouseX = evt.clientX - rect.left - root.scrollLeft;
+  mouseY = evt.clientY - rect.top - root.scrollTop;
+
+  paddleX = mouseX - PADDLE_WIDTH/2;
+
+}
+
+
+//All code responsible for structuring how elements and objects are displayed on the canvas.
+function drawBricks(){
+  //USING THE COLORRECT FUNCTION LOCATED ON LINE 67 TO DRAW THE RECTANGLES FOR THE BRICKS.
+  for(var eachRow = 0; eachRow < BRICK_ROWS; eachRow++){
+
+    for(var eachCol = 0; eachCol < BRICK_COLS; eachCol++){
+
+      var arrayIndex =  BRICK_COLS * eachRow + eachCol;
+
+      if(brickGrid[arrayIndex]){
+        colorRect(BRICK_W*eachCol, BRICK_H * eachRow, BRICK_W - BRICK_GAP,BRICK_H - BRICK_GAP, 'blue');
+      }
+
+    }
+
+  }
+
+}
+
+
+function colorRect(topLeftX, topLeftY, boxWidth,boxHeight, drawColor){
+
+  canvasContext.fillStyle = drawColor;
+  canvasContext.fillRect(topLeftX,topLeftY, boxWidth,boxHeight, drawColor);
+
+}
+
+
+function drawCircle(centerX,centerY, radius, fillColor){
+
+  canvasContext.fillStyle = fillColor;
+  canvasContext.beginPath(); //this is more of general routine
+  canvasContext.arc(centerX,centerY, radius, 0,Math.PI*2, true); //arc is more for drawing pi chart like things.
+  canvasContext.fill(); //this will fill the circle
+
+}
+
+
+function colorText(showWords, textX,textY, fillColor){
+
+  canvasContext.fillStyle = fillColor;
+  canvasContext.fillText(showWords, textX,textY);
 
 }
 
